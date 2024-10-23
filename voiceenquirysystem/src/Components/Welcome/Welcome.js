@@ -112,50 +112,41 @@ class Welcome extends Component
 
 
 	handleRegister = (event) => {
-		event.preventDefault();
-        // this.props.onRouteChange('home');
-       
-        console.log(this.state);
-        //this.props.RouteChanger('search',this.state.fromSelect,this.state.toSelect)
-
-        this.props.SetTravelDate(this.state.onwarddate);
-
-		fetch('http://localhost:3001/CheckRoute',{
-		  method:'post',
-		  headers:{'Content-Type':'application/json'},
-		  body:JSON.stringify({
-            fromSelect:this.state.fromSelect,
-            toSelect:this.state.toSelect
-            })
-		  }).then(res=> res.json())
-		  .then(data=>{this.setState({response:JSON.parse(data)})})
-		  .then(x=>{
-		   if(this.state.response.error==='')
-		  { 
-            this.props.setPlaces(this.state.fromSelect,this.state.toSelect)
-		   alert(this.state.response.response);
-           
-            this.props.Reset();
-              if(this.props.sbus===true)
-               {
-
-                for(var i=0;i<this.state.response.response.length;i++)
-                {
-                    this.props.SetRouteId(this.state.response.response[i],1)   
-                }
-                    this.props.onRouteChange('search')
-                }
-            else
-            {   
-                this.props.onRouteChange('locate')
-            } 
+        event.preventDefault();
+        
+        console.log('Submitting:', this.state.fromSelect, this.state.toSelect);
+      
+        fetch('http://localhost:3001/CheckRoute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fromSelect: this.state.fromSelect,
+            toSelect: this.state.toSelect
+          })
+        })
+        .then(res => res.json())  // No need to parse the response manually
+        .then(data => {
+          console.log("Backend response:", data);  // Log backend response directly
+      
+          if (data.error === '') {
+            console.log("Route IDs found:", data.response);
+            
+            this.props.setPlaces(this.state.fromSelect, this.state.toSelect);
+            
+            // Setting Route IDs in the parent state and switching to the search page
+            data.response.forEach(routeId => {
+              this.props.SetRouteId(routeId, 1);  // Check if route IDs are being set properly
+            });
+      
+            this.props.onRouteChange('search');  // Navigate to the search page
+          } else {
+            alert("No such route exists");
           }
-          else
-          {
-		    alert("No such route exists"+JSON.stringify(this.state.response));
-        } })
-        .catch((err)=>{console.log(err)})
-	}
+        })
+        .catch(err => console.log('Fetch error:', err));
+      }
+      
+      
 
 
     handleChange1 = (selectedOption) => {

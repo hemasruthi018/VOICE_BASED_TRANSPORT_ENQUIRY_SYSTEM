@@ -13,10 +13,10 @@ app.use(cors())
 app.use(bodyParser.json());
 
 var con = mysql.createConnection({
-  host: "database-1.czuepjtqzk8i.us-east-1.rds.amazonaws.com", 
-  user:"admin", 
-  password:"dbmsvoip",
-  database: "dbms"
+  host: "127.0.0.1", 
+  user:"root", 
+  password:"Nikhilgolla76",
+  database: "my_flask_app_db"
 });
  
 // make to connection to the database.
@@ -153,117 +153,114 @@ app.get('/Agencies',(req,res)=>{
 }); 
 
 
-app.get('/fetchBuses/:id',(req,res)=>{
-  
-  console.log(req.params.id);
+app.get('/fetchBuses/:id', (req, res) => {
+  const routeID = req.params.id;
 
-  con.query(`select * from BusSchedule natural join BusInfo where RouteID=${req.params.id}`, function (err, result, fields) {
-    
-    if (err) 
-      {
-        console.log('error');
-        console.log(err)
-      }
-      
-    var resx=[];
-      Object.keys(result).forEach(function(key) {
-      resx.push((result[key]));
-      
-    });
-      console.log(resx);
-      res.json(JSON.stringify(resx));
+  console.log(`Fetching buses for RouteID: ${routeID}`);
+
+  const query = `SELECT * FROM BusSchedule NATURAL JOIN BusInfo WHERE RouteID = ?`;
+
+  con.query(query, [routeID], (err, result) => {
+    if (err) {
+      console.log('Error fetching buses:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    if (result.length === 0) {
+      console.log(`No buses found for RouteID: ${routeID}`);
+      return res.status(404).json({ error: 'No buses found for this route' });
+    }
+
+    console.log(`Buses found for RouteID ${routeID}:`, result);
+
+    // Send the result directly as JSON (no need to JSON.stringify)
+    return res.json(result);
   });
-}); 
-
-
-
-
-app.post('/BookedSeats',(req,res)=>{
-  
-  var tdate=new Date(req.body.traveldate);
-  var bno=req.body.busregnno;
-  var dd=tdate.getUTCDate()+1;
-  var mm=tdate.getUTCMonth()+1;
-  var yyyy=tdate.getUTCFullYear();
-
-var xyz= yyyy+"-"+mm+"-"+dd;
-console.log(xyz)
-console.log(`select BookedSeats from Ticket natural join SeatsBooked where TravelDate='${xyz}' and BusRegnNo='${bno}'`);
-  con.query(`select BookedSeats from Ticket natural join SeatsBooked where TravelDate='${xyz}' and BusRegnNo='${bno}'`, function (err, result, fields) 
-  {
-
-      if (err) 
-      {
-        console.log('error');
-        console.log(err)
-
-      }
-      
-    var resx=[];
-      Object.keys(result).forEach(function(key) {
-      resx.push((result[key].BookedSeats.toString()));
-    });
-      console.log(resx);
-      res.json(JSON.stringify(resx));
-  });
-
-  
-}); 
-
-app.post('/Tickets',(req,res)=>{
-
-var rid=req.body.routeid;
-var regn=req.body.busregnno
-
-var bdate=new Date();
-var dd=bdate.getUTCDate()+1;
-var mm=bdate.getUTCMonth()+1;
-var yyyy=bdate.getUTCFullYear();
-var xyz= yyyy+"-"+mm+"-"+dd;
-
-var tdate=new Date(req.body.traveldate);
-var dd=tdate.getUTCDate()+1;
-var mm=tdate.getUTCMonth()+1;
-var yyyy=tdate.getUTCFullYear();
-var xyz2= yyyy+"-"+mm+"-"+dd;
-
- 
- console.log(`insert into Ticket (BusRegnNo,BookingDate,TravelDate) values ('${regn}','${xyz}','${xyz2}')`)
-          con.query(`insert into Ticket (BusRegnNo,BookingDate,TravelDate) values ('${regn}','${xyz}','${xyz2}')`, function (err, result, fields) {
-
-              if (err) 
-              {
-                console.log('error in Ticket');
-                console.log(err)
-
-              } 
-              else
-              {
-                 con.query(`select max(TicketPNR) as TicketPNR from Ticket`, function (err, res2, fields) {
-
-                      if (err) 
-                      {
-                        console.log('error');
-                        console.log(err)
-
-                      }
-
-                      var resx=[];
-                      Object.keys(res2).forEach(function(key) {
-                      resx.push((res2[key].TicketPNR.toString()));
-                      });
-                      console.log(resx);
-                      var abc={
-                        pnr:resx,
-                        error:err
-                      }
-                      res.json(JSON.stringify(abc));
-                      }); 
-                 console.log(result)  
-              }
-             
-})
 });
+
+
+
+
+app.post('/BookedSeats', (req, res) => {
+  const travelDate = req.body.traveldate;
+  
+  if (!travelDate || isNaN(new Date(travelDate))) {
+    console.log('Invalid traveldate received');
+    return res.status(400).json({ error: 'Invalid traveldate' });
+  }
+
+  const tdate = new Date(travelDate);
+  const dd = String(tdate.getUTCDate()).padStart(2, '0');
+  const mm = String(tdate.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = tdate.getUTCFullYear();
+  const formattedDate = `${yyyy}-${mm}-${dd}`;
+  const busRegNo = req.body.busregnno;
+
+  console.log(`Selecting booked seats for travel date ${formattedDate} and bus ${busRegNo}`);
+
+  con.query(`SELECT BookedSeats FROM Ticket NATURAL JOIN SeatsBooked WHERE TravelDate='${formattedDate}' AND BusRegnNo='${busRegNo}'`, (err, result) => {
+    if (err) {
+      console.log('Error fetching booked seats:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    const bookedSeats = result.map(row => row.BookedSeats.toString());
+    console.log(bookedSeats);
+    res.json(bookedSeats);
+  });
+});
+
+
+app.post('/Tickets', (req, res) => {
+  let travelDate = req.body.traveldate;
+
+  // If travelDate is invalid, use a default date at least 3 days after the booking date
+  const bookingDate = new Date();
+  const bdd = String(bookingDate.getUTCDate()).padStart(2, '0');
+  const bmm = String(bookingDate.getUTCMonth() + 1).padStart(2, '0');
+  const byyyy = bookingDate.getUTCFullYear();
+  const bookingFormattedDate = `${byyyy}-${bmm}-${bdd}`;
+
+  if (!travelDate || isNaN(new Date(travelDate))) {
+    console.log('Invalid or missing traveldate. Using default date 3 days after booking date.');
+    const defaultTravelDate = new Date(bookingDate);
+    defaultTravelDate.setDate(defaultTravelDate.getUTCDate() + 3); // Set travel date to 3 days later
+    const dd = String(defaultTravelDate.getUTCDate()).padStart(2, '0');
+    const mm = String(defaultTravelDate.getUTCMonth() + 1).padStart(2, '0');
+    const yyyy = defaultTravelDate.getUTCFullYear();
+    travelDate = `${yyyy}-${mm}-${dd}`;
+  } else {
+    const tdate = new Date(travelDate);
+    const dd = String(tdate.getUTCDate()).padStart(2, '0');
+    const mm = String(tdate.getUTCMonth() + 1).padStart(2, '0');
+    const yyyy = tdate.getUTCFullYear();
+    travelDate = `${yyyy}-${mm}-${dd}`;
+  }
+
+  const regn = req.body.busregnno;
+
+  console.log(`Insert into Ticket (BusRegnNo, BookingDate, TravelDate) values ('${regn}', '${bookingFormattedDate}', '${travelDate}')`);
+
+  con.query(`INSERT INTO Ticket (BusRegnNo, BookingDate, TravelDate) VALUES ('${regn}', '${bookingFormattedDate}', '${travelDate}')`, function (err, result) {
+    if (err) {
+      console.log('Error inserting into Ticket:', err);
+      return res.status(500).json({ error: 'Error inserting into Ticket' });
+    }
+    
+    con.query(`SELECT MAX(TicketPNR) AS TicketPNR FROM Ticket`, function (err, res2) {
+      if (err) {
+        console.log('Error fetching TicketPNR:', err);
+        return res.status(500).json({ error: 'Error fetching TicketPNR' });
+      }
+
+      const pnr = res2[0].TicketPNR;
+      console.log('Generated TicketPNR:', pnr);
+      res.json({ pnr });
+    });
+  });
+});
+
+
 
 app.post('/Through',(req,res)=>{
 
@@ -497,40 +494,38 @@ console.log(q)
 });
 
 app.post('/CheckRoute', async (req, res) => {
-   
+  const fromP = req.body.fromSelect;
+  const toP = req.body.toSelect;
 
-  var fromP = req.body.fromSelect;
-  var toP = req.body.toSelect;
+  console.log(`Received source: ${fromP}, destination: ${toP}`);
 
-var q="SELECT distinct RouteId FROM BusStops WHERE RouteId IN (SELECT RouteId FROM BusStops Where IntermediateStops='"+fromP+"' and RouteId in (SELECT RouteId FROM BusStops Where IntermediateStops='"+toP+"'))";
-console.log(q)
+  const query = `
+    SELECT DISTINCT RouteId 
+    FROM BusStops 
+    WHERE IntermediateStops = ? 
+    AND RouteId IN (
+      SELECT RouteId FROM BusStops WHERE IntermediateStops = ?
+    );
+  `;
 
-   con.query(q, function (err, result, fields) {
-   if (err) console.log(err);
-     if(result.length >= 1)
-     {
-      var resx=[];
-      Object.keys(result).forEach(function(key) {
-        resx.push((result[key]).RouteId);
-      });
+  con.query(query, [fromP, toP], function (err, result) {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
 
-       var abc={
-         error:'',
-         response:resx
-       }
-     }
-     else
-     {
-       var abc={
-         error:'No Such Route Exists',
-         response:'fail'
-       }
+    console.log("Query result:", result);
 
-     }
-     res.json(JSON.stringify(abc));
-
- });
-   
+    if (result.length > 0) {
+      const routeIds = result.map(row => row.RouteId);
+      console.log('RouteIds found:', routeIds);
+      // Return the response object without stringifying it
+      return res.json({ error: '', response: routeIds });
+    } else {
+      console.log('No such route exists');
+      return res.json({ error: 'No Such Route Exists', response: 'fail' });
+    }
+  });
 });
 
 
