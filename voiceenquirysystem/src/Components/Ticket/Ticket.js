@@ -33,46 +33,34 @@ class Ticket extends Component {
 
 
 class Ticket1 extends Component {
-
-constructor(props)
-{
-	super(props);
-	this.state={
-	 tx:new Date(),
-   txs:props.dot
+  constructor(props) {
+    super(props);
+    this.state = {
+      tx: new Date(), // current date
+      txs: new Date(props.dot) // ensure dot is converted to a Date object
+    };
   }
-}
 
+  render() {
+    const t = "            ";
+    const t1 = "      ";
 
-render()
-{
-
-const t="            "
-const t1="      "
-
-
-	return(
-	
-<div className="bg-white black tc" style={{margin:"0 auto",width:"1000px",height:"400px"}}>
-
-<h3 className="no">YOUR TICKET DETAILS</h3><hr/>
-<div>
-<img src={img} width="100px" height="auto"/>
-</div>
-<div className="bodydiv">
-<i><b>DATE OF TRAVEL:{this.state.txs.toDateString()}</b></i><br/>
-<i><b>BOOKED ON:{this.state.tx.toDateString()}</b></i><br/>
-<i><b>SERVICE START POINT:{this.props.start}</b></i><br/>
-<i><b>SERVICE END POINT:{this.props.to}</b></i><br/>
-<i><b>Booked Seats:{this.props.seats}</b></i><br/>
-
-</div>
-</div>
-
-
-		);
-}
-
+    return (
+      <div className="bg-white black tc" style={{margin: "0 auto", width: "1000px", height: "400px"}}>
+        <h3 className="no">YOUR TICKET DETAILS</h3><hr/>
+        <div>
+          <img src={img} width="100px" height="auto"/>
+        </div>
+        <div className="bodydiv">
+          <i><b>DATE OF TRAVEL: {this.state.txs.toDateString()}</b></i><br/>
+          <i><b>BOOKED ON: {this.state.tx.toDateString()}</b></i><br/>
+          <i><b>SERVICE START POINT: {this.props.start}</b></i><br/>
+          <i><b>SERVICE END POINT: {this.props.to}</b></i><br/>
+          <i><b>Booked Seats: {this.props.seats}</b></i><br/>
+        </div>
+      </div>
+    );
+  }
 }
 
 

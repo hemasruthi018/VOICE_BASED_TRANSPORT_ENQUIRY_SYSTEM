@@ -243,16 +243,14 @@ VALUES
 -- Insert into BusInfo after Admin
 INSERT INTO BusInfo (BusRegnNo, AgencyName, TotalSeats, AC, LocationName, Latitude, Longitude)  
 VALUES  
-('KA01AB1234', 'ABC Travels', 40, 1, 'Bangalore', 12.9716, 77.5946),  
-('KA02BC5678', 'CDE Travels', 45, 0, 'Chennai', 13.0827, 80.2707);
+('1234', 'ABC Travels', 40, 1, 'Bangalore', 12.9716, 77.5946),  
+('5678', 'CDE Travels', 45, 0, 'Chennai', 13.0827, 80.2707);
 
 INSERT INTO BusSchedule (BusRegnNo, RouteID, DriverID, StartTime, Fare, ReservedSeats, TravelTime)
 VALUES 
-('KA01AB1234', 3, 101, 17.30, 500, 0, 5),
-('KA02BC5678', 4, 102, 19.00, 600, 0, 6);
+('1234', 3, 101, 17.30, 500, 0, 5),
+('5678', 4, 102, 19.00, 600, 0, 6);
 ALTER TABLE Ticket DROP CONSTRAINT dat_chk;
-
-
 
 
 
