@@ -253,6 +253,32 @@ VALUES
 ALTER TABLE Ticket DROP CONSTRAINT dat_chk;
 
 
+select * from usertable;
+INSERT INTO RouteDetails (RouteID, RouteName, Source, Destination) VALUES
+(5, 'BGL-COI', 'Bangalore', 'Coimbatore'),
+(6, 'CNI-COI', 'Chennai', 'Coimbatore');
+-- Adding stops for Route 5 (Bangalore to Coimbatore)
+INSERT INTO BusStops (RouteId, IntermediateStops, StopNumber) 
+VALUES 
+(5, 'Bangalore', 1), 
+(5, 'Coimbatore', 2);
+
+-- Adding stops for Route 6 (Chennai to Coimbatore)
+INSERT INTO BusStops (RouteId, IntermediateStops, StopNumber) 
+VALUES 
+(6, 'Chennai', 1), 
+(6, 'Coimbatore', 2);
+INSERT INTO BusInfo (BusRegnNo, AgencyName, TotalSeats, AC, LocationName, Latitude, Longitude)  
+VALUES  
+('9012', 'ABC Travels', 50, 1, 'Bangalore', 12.9716, 77.5946),  
+('3456', 'CDE Travels', 45, 0, 'Chennai', 13.0827, 80.2707);
+INSERT INTO BusSchedule (BusRegnNo, RouteID, DriverID, StartTime, Fare, ReservedSeats, TravelTime)
+VALUES 
+    ('9012', 5, 105, 16.00, 750, 0, 6),   -- Bangalore to Coimbatore (EndTime = 24.00)
+    ('3456', 6, 106, 17.00, 800, 0, 4);   -- Chennai to Coimbatore (Adjusted TravelTime to 4)
+
+
+
 
 
 

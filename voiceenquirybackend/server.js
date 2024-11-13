@@ -461,7 +461,7 @@ app.post('/adminLogin', async (req, res) => {
    var user = req.body.username;
    var pass = req.body.password;
 
-var q="select * from UserTable where email='"+user+"' and Password='"+pass+"'"+" and Usertype='A'";
+var q="select * from UserTable where email='"+user+"' and Password='"+pass+"'"+" and Usertype='Admin'";
 console.log(q)
       con.query(q, function (err, result, fields) {
         if (err) console.log(err)
