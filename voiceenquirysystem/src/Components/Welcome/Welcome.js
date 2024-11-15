@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { AutoComplete } from 'primereact/autocomplete';
-import App from '../VoiceResolver/App';
 import './Welcome.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primereact/resources/primereact.min.css';
@@ -99,7 +98,6 @@ class Welcome extends Component {
                 minLength={1}
                 onChange={(e) => this.setState({ fromSelect: e.value })}
               />
-              <App id="sourcePlaceVoice" />
             </div>
 
             <div className="form-group col-md-10">
@@ -114,7 +112,6 @@ class Welcome extends Component {
                 minLength={1}
                 onChange={(e) => this.setState({ toSelect: e.value })}
               />
-              <App id="destinationPlaceVoice" />
             </div>
 
             <div className="form-group col-md-10">

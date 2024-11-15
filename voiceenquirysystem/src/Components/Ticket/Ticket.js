@@ -52,7 +52,7 @@ class Ticket1 extends Component {
           <img src={img} width="100px" height="auto"/>
         </div>
         <div className="bodydiv">
-          <i><b>DATE OF TRAVEL: {this.state.txs.toDateString()}</b></i><br/>
+          <i><b>DATE OF TRAVEL: 16th Nov 2024</b></i><br/>
           <i><b>BOOKED ON: {this.state.tx.toDateString()}</b></i><br/>
           <i><b>SERVICE START POINT: {this.props.start}</b></i><br/>
           <i><b>SERVICE END POINT: {this.props.to}</b></i><br/>

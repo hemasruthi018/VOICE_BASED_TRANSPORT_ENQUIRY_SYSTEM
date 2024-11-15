@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 var con = mysql.createConnection({
   host: "127.0.0.1", 
   user:"root", 
-  password:"Nikhilgolla76",
+  password:"sruthi123",
   database: "my_flask_app_db"
 });
  
